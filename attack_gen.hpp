@@ -10,3 +10,5 @@ extern bboard king_att[64];
 void create_pawn_attacks (bboard (&bb)[2][64]);
 void create_knight_attacks (bboard (&bb)[64]);
 void create_king_attacks (bboard (&bb)[64]);
+void create_bishop_masks (bboard (&bb)[64]);
+void create_rook_masks (bboard (&bb)[64]);

@@ -3,5 +3,6 @@
 
 int main (void) {
     if (run_bit_manip_tests()) exit(EXIT_FAILURE);
+    if (run_mask_gen_tests()) exit(EXIT_FAILURE);
     if (run_attack_gen_tests()) exit(EXIT_FAILURE);
 }

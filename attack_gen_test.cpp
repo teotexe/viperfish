@@ -1,5 +1,48 @@
 #include "attack_gen_test.hpp"
 
+bool run_mask_gen_tests () {
+    std::cout << "[?] MASK GENERATION TESTS RUNNING\n"; 
+    bool fail = false;
+
+    bboard bishop_masks[64] = {0};
+    create_bishop_masks(bishop_masks);
+    if (bishop_masks[a1] == 0x0040201008040200ULL) {
+        std::cout << "[PASS]\n";
+    } else {
+        std::cout << "[FAIL]\n";
+        fail = true;
+    }
+    if (bishop_masks[d4] == 0x0040221400142200ULL) {
+        std::cout << "[PASS]\n";
+    } else {
+        std::cout << "[FAIL]\n";
+        fail = true;
+    }
+
+    bboard rook_masks[64] = {0};
+    create_rook_masks(rook_masks);
+    if (rook_masks[a1] == 0x000101010101017EULL) {
+        std::cout << "[PASS]\n";
+    } else {
+        std::cout << "[FAIL]\n";
+        fail = true;
+    }
+    if (rook_masks[d4] == 0x0008080876080800ULL) {
+        std::cout << "[PASS]\n";
+    } else {
+        std::cout << "[FAIL]\n";
+        fail = true;
+    }
+
+    if (!fail) {
+        std::cout << "[+] MASK GENERATION TESTS PASSED\n";
+    } else {
+        std::cout << "[X] MASK GENERATION TESTS FAILED\n";
+    }
+
+    return fail;
+}
+
 bool run_attack_gen_tests () {
     std::cout << "[?] ATTACK GENERATION TESTS RUNNING\n"; 
     bool fail = false;

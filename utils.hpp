@@ -33,5 +33,5 @@ constexpr bboard not_ab_files = 18229723555195321596ULL;
 // Not H, G files mask bitboard
 constexpr bboard not_gh_files = 4557430888798830399ULL;
 
-uint8_t getrank (square sq);
-uint8_t getfile (square sq);
+int8_t getrank (square sq);
+int8_t getfile (square sq);
