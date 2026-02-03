@@ -7,6 +7,8 @@ using state = uint8_t;
 using square = uint8_t;
 using counter = uint8_t;
 using flag = uint8_t;
+using piece = uint8_t;
+using move = uint32_t;
 
 enum { white, black, both };
 enum {
