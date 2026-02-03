@@ -129,15 +129,19 @@ bboard create_rook_table (square sq, bboard block) {
 
     for (int8_t r = rank - 1; r >= 0; r--) {
         att |= (1ULL << (r * 8 + file));
+        if ((1ULL << (r * 8 + file)) & block) break;
     }
     for (int8_t r = rank + 1; r <= 7; r++) {
         att |= (1ULL << (r * 8 + file));
+        if ((1ULL << (r * 8 + file)) & block) break;
     }
     for (int8_t f = file - 1; f >= 0; f--) {
         att |= (1ULL << (rank * 8 + f));
+        if ((1ULL << (rank * 8 + f)) & block) break;
     }
     for (int8_t f = file + 1; f <= 7; f++) {
         att |= (1ULL << (rank * 8 + f));
+        if ((1ULL << (rank * 8 + f)) & block) break;
     }
 
     return att;
