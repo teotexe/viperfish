@@ -267,6 +267,7 @@ __always_inline void generate_moves_rook (Moves &move_list, state side) {
 
         // Init piece attacks
         attacks = get_rook_att(source_sq, occupancies[both]) & (~occupancies[side]);
+        attacks &= legal_mv_mask;
 
         // Loop over target squares available
         while (attacks) {
@@ -301,6 +302,7 @@ __always_inline void generate_moves_knight (Moves &move_list, state side) {
         source_sq = getls1b(bitboard);
         // Get attacks that do not land on same side's pieces
         attacks = knight_att[source_sq] & (~occupancies[side]);
+        attacks &= legal_mv_mask;
 
         while (attacks) {
             target_sq = getls1b(attacks);
@@ -329,6 +331,7 @@ __always_inline void generate_moves_bishop (Moves &move_list, state side) {
         source_sq = getls1b(bitboard);
         // Get attacks that do not land on same side's pieces
         attacks = get_bishop_att(source_sq, occupancies[both]) & (~occupancies[side]);
+        attacks &= legal_mv_mask;
 
         while (attacks) {
             target_sq = getls1b(attacks);
@@ -454,6 +457,7 @@ __always_inline void generate_moves_queen (Moves &move_list, state side) {
 
         // Init piece attacks
         attacks = get_queen_att(source_sq, occupancies[both]) & (~occupancies[side]);
+        attacks &= legal_mv_mask;
 
         // Loop over target squares available
         while (attacks) {

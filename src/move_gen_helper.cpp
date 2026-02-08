@@ -54,7 +54,7 @@ void create_blocker_tables (bboard (&bb)[64][64]) {
         
         bits_inbetween = 0ULL;
         for (int8_t f = file + 2; f <= 7; f++){
-            bits_inbetween |= (1ULL << (rank * 8 + f - 1));
+            bits_inbetween |= (1ULL << (rank * 8 + (f - 1)));
             bb[sq][rank * 8 + f] |= bits_inbetween;
         }
     }
