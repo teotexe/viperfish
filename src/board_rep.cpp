@@ -2,6 +2,7 @@
 
 bboard bitboards[12];
 bboard occupancies[3];
+
 bboard checkers;
 bboard pins;
 

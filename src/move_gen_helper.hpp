@@ -12,8 +12,49 @@ typedef struct {
 
 extern bboard blocker_tables[64][64];
 extern bboard legal_mv_mask;
+extern bboard pin_mask[64];
 
 void create_blocker_tables (bboard (&bb)[64][64]);
+
+// Handles pinned pieces
+// pins: bitboard of the pieces pinned by the opponent
+// pins_mask: mask to allow moving pinned piece only in pin's direction
+__always_inline void find_pins(state side) {
+    pins = 0ULL;
+    square king_sq = getls1b(bitboards[(side == white) ? K : k]);
+
+    // Get all possible opponents pinners (slider pieces)
+    bboard bishop_like = (side == white) 
+        ? (bitboards[b] | bitboards[q]) 
+        : (bitboards[B] | bitboards[Q]);
+    bboard rook_like = (side == white) 
+        ? (bitboards[r] | bitboards[q]) 
+        : (bitboards[R] | bitboards[Q]);
+    bboard opponents = bishop_like | rook_like;
+
+    // For each potential pinner
+    while (opponents) {
+        square pinner_sq = getls1b(opponents);
+        popbit(opponents, pinner_sq);
+
+        // Check if it's in diagonal or line of king
+        bboard between = blocker_tables[pinner_sq][king_sq];
+        if (!between) continue;
+
+        // Find pieces in between
+        bboard blockers = between & occupancies[both];
+        // If any && it's only one
+        if (blockers && ((blockers & (blockers - 1ULL)) == 0ULL)) {
+            square blocker_sq = getls1b(blockers);
+
+            // Check if is a friendly piece
+            if (getbit(occupancies[side], blocker_sq)) {
+                pins |= (1ULL << blocker_sq);
+                pin_mask[blocker_sq] = between | (1ULL << pinner_sq);
+            }
+        }
+    }
+}
 
 // Generate a bitboard of pieces that are checking the king of the current given side
 __always_inline void find_checkers (state side) {
@@ -273,6 +314,7 @@ __always_inline void generate_moves_rook (Moves &move_list, state side) {
 
         // Init piece attacks
         attacks = get_rook_att(source_sq, occupancies[both]) & (~occupancies[side]);
+        if (getbit(pins, source_sq)) attacks &= pin_mask[source_sq];
         attacks &= legal_mv_mask;
 
         // Loop over target squares available
@@ -337,6 +379,7 @@ __always_inline void generate_moves_bishop (Moves &move_list, state side) {
         source_sq = getls1b(bitboard);
         // Get attacks that do not land on same side's pieces
         attacks = get_bishop_att(source_sq, occupancies[both]) & (~occupancies[side]);
+        if (getbit(pins, source_sq)) attacks &= pin_mask[source_sq];
         attacks &= legal_mv_mask;
 
         while (attacks) {
@@ -463,6 +506,7 @@ __always_inline void generate_moves_queen (Moves &move_list, state side) {
 
         // Init piece attacks
         attacks = get_queen_att(source_sq, occupancies[both]) & (~occupancies[side]);
+        if (getbit(pins, source_sq)) attacks &= pin_mask[source_sq];
         attacks &= legal_mv_mask;
 
         // Loop over target squares available

@@ -73,6 +73,9 @@ __always_inline void generate_moves (Moves &move_list) {
             legal_mv_mask = 0xFFFFFFFFFFFFFFFFULL;
         }
 
+        // Compute pins and pins_mask
+        find_pins(stm);
+
         for (piece curr_piece = P; curr_piece <= Q; curr_piece++) {
             if (curr_piece == P) {
                 generate_moves_white_pawn(move_list);
@@ -106,6 +109,9 @@ __always_inline void generate_moves (Moves &move_list) {
         } else {
             legal_mv_mask = 0xFFFFFFFFFFFFFFFFULL;
         }
+
+        // Compute pins and pins_mask
+        find_pins(stm);
 
         for (piece curr_piece = p; curr_piece <= q; curr_piece++) {
             if (curr_piece == p) {

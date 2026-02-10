@@ -2,6 +2,7 @@
 
 bboard blocker_tables[64][64];
 bboard legal_mv_mask;
+bboard pin_mask[64];
 
 void create_blocker_tables (bboard (&bb)[64][64]) {
     for (square sq = a1; sq <= h8; sq++) {

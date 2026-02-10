@@ -1,4 +1,5 @@
 #include "move_gen_test.hpp"
+#include <cstring>
 
 bool run_move_gen_tests () {
     std::cout << "[?] MOVE GENERATION TESTS RUNNING\n"; 

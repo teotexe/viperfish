@@ -4,6 +4,7 @@
 
 extern bboard bitboards[12];
 extern bboard occupancies[3];
+
 extern bboard checkers;
 extern bboard pins;
 

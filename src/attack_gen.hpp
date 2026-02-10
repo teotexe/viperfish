@@ -177,18 +177,21 @@ void create_rook_masks (bboard (&bb)[64]);
 void create_bishop_attacks (bboard (&bb)[64][512]);
 void create_rook_attacks (bboard (&bb)[64][4096]);
 
+// Returns occupancy-aware bishop attacks
 __always_inline bboard get_bishop_att (square sq, bboard occ) {
     occ &= bishop_masks[sq];
     occ *= bishop_magic_nums[sq];
     return bishop_att[sq][occ >> (64 - bishop_relevant_bits[sq])];
 }
 
+// Returns occupancy-aware rook attacks
 __always_inline bboard get_rook_att (square sq, bboard occ) {
     occ &= rook_masks[sq];
     occ *= rook_magic_nums[sq];
     return rook_att[sq][occ >> (64 - rook_relevant_bits[sq])];
 }
 
+// Returns occupancy-aware queen attacks
 __always_inline bboard get_queen_att (square sq, bboard occ) {
     return get_bishop_att(sq, occ) | get_rook_att(sq, occ);
 }
