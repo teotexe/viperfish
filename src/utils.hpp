@@ -41,5 +41,10 @@ constexpr const char* starting_pos = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBN
 constexpr const char* tricky_pos = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1";
 constexpr const char* killer_pos = "rnbqkb1r/pp1p1pPp/8/2p1pP2/1P1P4/3P3P/P1P1P3/RNBQKBNR w KQkq e6 0 1";
 
+constexpr char char_pieces[12] = {
+    'P', 'R', 'N', 'B', 'K', 'Q',
+    'p', 'r', 'n', 'b', 'k', 'q',
+};
+
 int8_t getrank (square sq);
 int8_t getfile (square sq);
