@@ -22,6 +22,17 @@ constexpr uint32_t double_push_flag_mask = 0x200000;
 constexpr uint32_t en_passant_flag_mask = 0x300000;
 constexpr uint32_t castling_flag_mask = 0x400000;
 
+constexpr uint8_t update_castling_rights[64] = {
+    13, 15, 15, 15, 12, 15, 15, 14,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+    15, 15, 15, 15, 15, 15, 15, 15,
+     7, 15, 15, 15,  3, 15, 15, 11,
+};
+
 __always_inline square get_mv_src (move mv) {
     return mv & source_sq_mask;
 }
@@ -136,35 +147,24 @@ __always_inline void generate_moves (Moves &move_list) {
     }
 }
 
-constexpr uint8_t update_castling_rights[64] = {
-     7, 15, 15, 15,  3, 15, 15, 11,
-    15, 15, 15, 15, 15, 15, 15, 15,
-    15, 15, 15, 15, 15, 15, 15, 15,
-    15, 15, 15, 15, 15, 15, 15, 15,
-    15, 15, 15, 15, 15, 15, 15, 15,
-    15, 15, 15, 15, 15, 15, 15, 15,
-    15, 15, 15, 15, 15, 15, 15, 15,
-    13, 15, 15, 15, 12, 15, 15, 14,
-};
-
 // Make one move
 __always_inline int make_move(int move) {
-    int source = get_mv_src(move);
-    int target = get_mv_trgt(move);
-    int piece = get_mv_piece(move);
-    int promoted = get_mv_prmtd(move);
-    int capture = get_mv_cptr(move);
-    int double_move = get_mv_dblpsh(move);
-    int en_passant_move = get_mv_enpsnt(move);
-    int castling = get_mv_cstlng(move);
+    square source = get_mv_src(move);
+    square target = get_mv_trgt(move);
+    piece curr_piece = get_mv_piece(move);
+    piece promoted = get_mv_prmtd(move);
+    flag capture = get_mv_cptr(move);
+    flag double_move = get_mv_dblpsh(move);
+    square en_passant_move = get_mv_enpsnt(move);
+    flag castling = get_mv_cstlng(move);
 
     // Refs to occupancies bboards
     bboard *own_occ = &occupancies[stm];
-    bboard *opp_occ = &occupancies[stm ^ 1];
+    bboard *opp_occ = &occupancies[!stm];
 
     // Move the piece
-    popbit(bitboards[piece], source);
-    setbit(bitboards[piece], target);
+    popbit(bitboards[curr_piece], source);
+    setbit(bitboards[curr_piece], target);
 
     // Update own occupancy
     popbit(*own_occ, source);
@@ -173,19 +173,21 @@ __always_inline int make_move(int move) {
     // Handle captures (including normal capture on target)
     if (capture) {
         int cap_sq = target;
+        // REVIEW NOTE: the target square should be set correctly even for en passant
         // En passant captures use different square
-        if (en_passant_move) cap_sq = (stm == white) ? (target + 8) : (target - 8);
+        // if (en_passant_move) cap_sq = (stm == white) ? (target + 8) : (target - 8);
 
         // Remove from opponent occupancies
         popbit(*opp_occ, cap_sq);
 
-        // Find the piece on the capture square 
-        // and clear its bitboard
-        int start = (stm == white) ? p : P;
-        int end   = (stm == white) ? q : Q;
-        for (int bb = start; bb <= end; bb++) {
-            if (getbit(bitboards[bb], cap_sq)) {
-                popbit(bitboards[bb], cap_sq);
+        // Find the opponent's piece on the capture square and remove it
+
+        // Loop over opposite side's pieces
+        piece start = (stm == white) ? p : P;
+        piece end   = (stm == white) ? q : Q;
+        for (piece pc = start; pc <= end; pc++) {
+            if (getbit(bitboards[pc], cap_sq)) {
+                popbit(bitboards[pc], cap_sq);
                 break;
             }
         }
@@ -193,15 +195,12 @@ __always_inline int make_move(int move) {
 
     // Handle promotion
     if (promoted) {
-        int pawn = (stm == white) ? P : p;
+        piece pawn = (stm == white) ? P : p;
         
         // Remove the pawn
         popbit(bitboards[pawn], target);
-        popbit(*own_occ, target);
-        
         // Promote it
         setbit(bitboards[promoted], target);
-        setbit(*own_occ, target);
     }
 
     // ???????????
