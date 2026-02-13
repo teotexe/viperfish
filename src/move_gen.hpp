@@ -104,7 +104,7 @@ __always_inline int make_move (int move) {
     piece promoted = get_mv_prmtd(move);
     flag capture = get_mv_cptr(move);
     flag double_move = get_mv_dblpsh(move);
-    square en_passant_move = get_mv_enpsnt(move);
+    flag en_passant_move = get_mv_enpsnt(move);
     flag castling_flag = get_mv_cstlng(move);
 
     // Refs to occupancies bboards
@@ -122,9 +122,8 @@ __always_inline int make_move (int move) {
     // Handle captures (including normal capture on target)
     if (capture) {
         int cap_sq = target;
-        // REVIEW NOTE: the target square should be set correctly even for en passant
         // En passant captures use different square
-        // if (en_passant_move) cap_sq = (stm == white) ? (target + 8) : (target - 8);
+        if (en_passant_move) cap_sq = (stm == white) ? (target - 8) : (target + 8);
 
         // Remove from opponent occupancies
         popbit(*opp_occ, cap_sq);
