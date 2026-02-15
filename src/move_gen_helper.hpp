@@ -14,6 +14,7 @@ typedef struct {
 
 extern bboard blocker_tables[64][64];
 extern bboard legal_mv_mask;
+extern bboard pawn_mv_mask;
 extern bboard pin_mask[64];
 
 // Binary move's representation:
@@ -227,7 +228,7 @@ __always_inline void generate_moves_white_pawn(Moves &move_list) {
         // Generate quiet pawn moves
         if ((target_square >= a1) && !getbit(occupancies[both], target_square)) {
             // Pawn promotion
-            if (a7 <= source_square && source_square <= h7 && getbit(legal_mv_mask, target_square) && (!pinned || getbit(pin_mask[source_square], target_square))) {
+            if (a7 <= source_square && source_square <= h7 && getbit(pawn_mv_mask, target_square) && (!pinned || getbit(pin_mask[source_square], target_square))) {
                 add_move(move_list, encode_move(source_square, target_square, curr_piece, Q, 0, 0, 0, 0));
                 add_move(move_list, encode_move(source_square, target_square, curr_piece, R, 0, 0, 0, 0));
                 add_move(move_list, encode_move(source_square, target_square, curr_piece, B, 0, 0, 0, 0));
@@ -236,12 +237,12 @@ __always_inline void generate_moves_white_pawn(Moves &move_list) {
 
             else {
                 // One square pawn move
-                if (getbit(legal_mv_mask, target_square) && (!pinned || getbit(pin_mask[source_square], target_square))) {
+                if (getbit(pawn_mv_mask, target_square) && (!pinned || getbit(pin_mask[source_square], target_square))) {
                     add_move(move_list, encode_move(source_square, target_square, curr_piece, 0, 0, 0, 0, 0));
                 }
 
                 // Two square pawn move
-                if ((a2 <= source_square && source_square <= h2) && !getbit(occupancies[both], target_square + 8) && getbit(legal_mv_mask, target_square + 8) && (!pinned || getbit(pin_mask[source_square], target_square + 8))) {
+                if ((a2 <= source_square && source_square <= h2) && !getbit(occupancies[both], target_square + 8) && getbit(pawn_mv_mask, target_square + 8) && (!pinned || getbit(pin_mask[source_square], target_square + 8))) {
                     add_move(move_list, encode_move(source_square, target_square + 8, curr_piece, 0, 0, 1, 0, 0));
                 }
             }
@@ -250,7 +251,7 @@ __always_inline void generate_moves_white_pawn(Moves &move_list) {
         // Init pawn attacks bitboard
         attacks = pawn_att[white][source_square] & occupancies[black];
         if (getbit(pins, source_square)) attacks &= pin_mask[source_square];
-        attacks &= legal_mv_mask;
+        attacks &= pawn_mv_mask;
 
         // Generate pawn captures
         while (attacks) {
@@ -275,7 +276,7 @@ __always_inline void generate_moves_white_pawn(Moves &move_list) {
         }
 
         // Generate en passant capture
-        if (enpassant != no_sq && getbit(legal_mv_mask, enpassant) && (!pinned || getbit(pin_mask[source_square], enpassant))) {
+        if (enpassant != no_sq && getbit(pawn_mv_mask, enpassant) && (!pinned || getbit(pin_mask[source_square], enpassant))) {
             // Create en passant attack bitboard
             bboard en_passant_attacks = pawn_att[white][source_square] & (1ULL << enpassant);
 
@@ -311,7 +312,7 @@ __always_inline void generate_moves_black_pawn(Moves &move_list) {
         // Generate quiet pawn moves
         if ((target_square <= h8) && !getbit(occupancies[both], target_square)) {
             // Pawn promotion
-            if (a2 <= source_square && source_square <= h2 && getbit(legal_mv_mask, target_square) && (!pinned || getbit(pin_mask[source_square], target_square))) {
+            if (a2 <= source_square && source_square <= h2 && getbit(pawn_mv_mask, target_square) && (!pinned || getbit(pin_mask[source_square], target_square))) {
                 add_move(move_list, encode_move(source_square, target_square, curr_piece, q, 0, 0, 0, 0));
                 add_move(move_list, encode_move(source_square, target_square, curr_piece, r, 0, 0, 0, 0));
                 add_move(move_list, encode_move(source_square, target_square, curr_piece, b, 0, 0, 0, 0));
@@ -320,12 +321,12 @@ __always_inline void generate_moves_black_pawn(Moves &move_list) {
 
             else {
                 // One square pawn move
-                if (getbit(legal_mv_mask, target_square) && (!pinned || getbit(pin_mask[source_square], target_square))) {
+                if (getbit(pawn_mv_mask, target_square) && (!pinned || getbit(pin_mask[source_square], target_square))) {
                     add_move(move_list, encode_move(source_square, target_square, curr_piece, 0, 0, 0, 0, 0));
                 }
 
                 // Two square pawn move
-                if ((a7 <= source_square && source_square <= h7) && !getbit(occupancies[both], target_square - 8) && getbit(legal_mv_mask, target_square - 8) && (!pinned || getbit(pin_mask[source_square], target_square - 8))) {
+                if ((a7 <= source_square && source_square <= h7) && !getbit(occupancies[both], target_square - 8) && getbit(pawn_mv_mask, target_square - 8) && (!pinned || getbit(pin_mask[source_square], target_square - 8))) {
                     add_move(move_list, encode_move(source_square, target_square - 8, curr_piece, 0, 0, 1, 0, 0));
                 }
             }
@@ -334,7 +335,7 @@ __always_inline void generate_moves_black_pawn(Moves &move_list) {
         // Init pawn attacks bitboard
         attacks = pawn_att[black][source_square] & occupancies[white];
         if (getbit(pins, source_square)) attacks &= pin_mask[source_square];
-        attacks &= legal_mv_mask;
+        attacks &= pawn_mv_mask;
 
         // Generate pawn captures
         while (attacks) {
@@ -359,7 +360,7 @@ __always_inline void generate_moves_black_pawn(Moves &move_list) {
         }
 
         // Generate en passant capture
-        if (enpassant != no_sq && getbit(legal_mv_mask, enpassant) && (!pinned || getbit(pin_mask[source_square], enpassant))) {
+        if (enpassant != no_sq && getbit(pawn_mv_mask, enpassant) && (!pinned || getbit(pin_mask[source_square], enpassant))) {
             // Create en passant attack bitboard
             bboard en_passant_attacks = pawn_att[black][source_square] & (1ULL << enpassant);
 

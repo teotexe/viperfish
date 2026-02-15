@@ -19,6 +19,8 @@ __always_inline void generate_moves (Moves &move_list) {
 
     find_checkers(!stm);
 
+    pawn_mv_mask = 0ULL;
+
     if (stm == white) {
         if (countbits(checkers) > 1) {
             generate_moves_king(move_list, white);
@@ -29,10 +31,11 @@ __always_inline void generate_moves (Moves &move_list) {
             square king_sq = getls1b(bitboards[K]);
             square checker_sq = getls1b(checkers);
             legal_mv_mask = blocker_tables[king_sq][checker_sq] | checkers;
-            if (enpassant != no_sq && (1ULL << (enpassant - 8)) & checkers) legal_mv_mask |= (1ULL << enpassant);
+            if (enpassant != no_sq && (1ULL << (enpassant - 8)) & checkers) pawn_mv_mask |= (1ULL << enpassant);
         } else {
             legal_mv_mask = 0xFFFFFFFFFFFFFFFFULL;
         }
+        pawn_mv_mask |= legal_mv_mask;
 
         // Compute pins and pins_mask
         find_pins(stm);
@@ -67,10 +70,11 @@ __always_inline void generate_moves (Moves &move_list) {
             square king_sq = getls1b(bitboards[k]);
             square checker_sq = getls1b(checkers);
             legal_mv_mask = blocker_tables[king_sq][checker_sq] | checkers;
-            if (enpassant != no_sq && (1ULL << (enpassant + 8)) & checkers) legal_mv_mask |= (1ULL << enpassant);
+            if (enpassant != no_sq && (1ULL << (enpassant + 8)) & checkers) pawn_mv_mask |= (1ULL << enpassant);
         } else {
             legal_mv_mask = 0xFFFFFFFFFFFFFFFFULL;
         }
+        pawn_mv_mask |= legal_mv_mask;
 
         // Compute pins and pins_mask
         find_pins(stm);
