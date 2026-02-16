@@ -3,16 +3,15 @@
 #include <iostream>
 #include "move_gen.hpp"
 #include "test_utils.hpp"
+#include "fen.hpp"
 
-void run_perft(int depth);
+uint64_t run_perft (uint8_t depth);
+void run_user_perft (uint8_t depth);
+bool run_perfts ();
 
-extern int capturess;
-extern int checkss;
-
-inline void perft_driver(int depth, unsigned long long &nodes) {
+inline void perft_driver(uint8_t depth, uint64_t &nodes) {
     if (depth == 0) {
         nodes++;
-        checkss += is_sq_attacked(!stm, getls1b(bitboards[(stm == white) ? K : k]));
         return;
     }
 
@@ -26,9 +25,6 @@ inline void perft_driver(int depth, unsigned long long &nodes) {
         BoardState board;
         copy_board_state(board);
 
-        if (depth == 1) {
-            capturess += get_mv_cptr(mv);
-        }
         // Make move
         make_move(mv);
 

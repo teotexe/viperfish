@@ -114,12 +114,12 @@ __always_inline void find_pins(state side) {
         if (countbits(blockers) == 2 && countbits(white_blocker_pawns) == 1 && countbits(black_blocker_pawns) == 1) {
             if (side == white) {
                 square blocker_sq = getls1b(white_blocker_pawns);
-                if (enpassant != no_sq && (pawn_att[white][blocker_sq] & (1ULL << enpassant))) {
+                if (enpassant != no_sq && (pawn_att[white][blocker_sq] & (1ULL << enpassant)) && (1ULL << (enpassant - 8)) & black_blocker_pawns) {
                     enpassant = no_sq;
                 }
             } else {
                 square blocker_sq = getls1b(black_blocker_pawns);
-                if (enpassant != no_sq && (pawn_att[black][blocker_sq] & (1ULL << enpassant))) {
+                if (enpassant != no_sq && (pawn_att[black][blocker_sq] & (1ULL << enpassant)) && ((1ULL << (enpassant + 8)) & white_blocker_pawns)) {
                     enpassant = no_sq;
                 }
             }
