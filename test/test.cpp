@@ -13,7 +13,7 @@ int main (void) {
     if (run_move_gen_tests()) exit(EXIT_FAILURE);
     if (run_fen_tests()) exit(EXIT_FAILURE);
     
-    // parse_fen(starting_pos);
+    // parse_fen(tricky_pos);
     // make_move(encode_move(e2, e3, P, 0, 0, 0, 0, 0));
     // make_move(encode_move(e7, e5, p, 0, 0, 1, 0, 0));
     // make_move(encode_move(d1, e2, Q, 0, 0, 0, 0, 0));
@@ -21,7 +21,7 @@ int main (void) {
     // make_move(encode_move(d2, d4, P, 0, 0, 1, 0, 0));
     // print_board();
     // std::cout << hr_squares[enpassant] << "\n";
-    // run_user_perft(1);
+    // run_user_perft(6);
 
     // Returns success
     if (!run_perfts()) exit(EXIT_FAILURE);

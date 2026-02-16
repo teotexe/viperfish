@@ -10,13 +10,13 @@ void run_user_perft (uint8_t depth);
 bool run_perfts ();
 
 inline void perft_driver(uint8_t depth, uint64_t &nodes) {
-    if (depth == 0) {
-        nodes++;
-        return;
-    }
-
     Moves move_list;
     generate_moves(move_list);
+
+    if (depth == 1) {
+        nodes += move_list.index;
+        return;
+    }
 
     for (uint8_t i = 0; i < move_list.index; i++) {
         move mv = move_list.moves[i];
