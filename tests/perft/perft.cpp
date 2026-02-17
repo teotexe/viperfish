@@ -1,4 +1,5 @@
 #include "perft.hpp"
+#include <chrono>
 
 void perft_driver(uint8_t depth, uint64_t &nodes) {
     Moves move_list;
@@ -86,15 +87,38 @@ void run_stress_test () {
 
 }
 
+void run_manual_test (int argc, char* argv[]) {
+    if (argc < 3 || argc > 4) {
+        std::cerr << "Usage: perft --manual <depth> [\"<FEN>\"]\n";
+        std::cerr << "If no FEN is provided the standard starting position is used.\n";
+        return;
+    }
+
+    int depth = std::stoi(argv[2]);
+
+    std::string fen;
+    if (argc == 4) {
+        fen = argv[3];
+    } else {
+        // Standard starting position
+        fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    }
+
+    parse_fen(fen);
+    uint64_t result = run_perft(static_cast<uint8_t>(depth));
+    std::cout << result << "\n";
+}
+
 int main (int argc, char* argv[]) {
     std::string commands[] = {
         "--help",
         "--smoke",
         "--standard",
         "--stress",
+        "--manual",
     };
 
-    if (argc != 2) {
+    if (argc < 2) {
         std::cerr << "Only one command is accepted.\n";
         std::cerr << "See 'perft --help'.\n";
         return EXIT_FAILURE;
@@ -111,16 +135,26 @@ int main (int argc, char* argv[]) {
     }
 
     init_board_state();
-    
+
+    auto t0 = std::chrono::steady_clock::now();
+
     if (command == "--smoke") {
         run_smoke_test();
     } else if (command == "--standard") {
         run_standard_test();
     } else if (command == "--stress") {
         run_stress_test();
+    } else if (command == "--manual") {
+        run_manual_test(argc, argv);
     } else {
         std::cerr << "Unknown command.\n";
         std::cerr << "See 'perft --help'.\n";
         return EXIT_FAILURE;
     }
+
+    auto t1 = std::chrono::steady_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+    std::cout << "[*] " << command << " completed in " << ms << " ms\n";
+
+    return EXIT_SUCCESS;
 }
