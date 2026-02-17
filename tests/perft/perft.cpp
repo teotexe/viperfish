@@ -111,6 +111,8 @@ int main (int argc, char* argv[]) {
     }
 
     init_board_state();
+
+    auto t0 = std::chrono::steady_clock::now();
     
     if (command == "--smoke") {
         run_smoke_test();
@@ -123,4 +125,10 @@ int main (int argc, char* argv[]) {
         std::cerr << "See 'perft --help'.\n";
         return EXIT_FAILURE;
     }
+
+    auto t1 = std::chrono::steady_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+    std::cout << "[*] " << command << " completed in " << ms << " ms\n";
+
+    return EXIT_SUCCESS;
 }
