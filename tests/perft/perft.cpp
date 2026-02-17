@@ -69,10 +69,11 @@ bool run_test (const std::string &filepath) {
 
         parse_fen(perftcase.fen);
         uint64_t result = run_perft(perftcase.depth);
+
         if (result != perftcase.expected) {
             std::cerr << "\n[FAIL]\n";
-            std::cerr << "expected: " << perftcase.expected << "\n";
-            std::cerr << "result: " << result << "\n";
+            std::cerr << "Expected: " << perftcase.expected << "\n";
+            std::cerr << "Result: " << result << "\n";
             return false;
         }
 
