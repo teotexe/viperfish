@@ -56,7 +56,6 @@ bool run_test (const std::string &filepath) {
     std::vector<PerftCase> cases;
     parse_epd(filepath, cases);
 
-    bool success = true;
     uint16_t progress = 0;
     float percentage;
 
@@ -71,24 +70,22 @@ bool run_test (const std::string &filepath) {
         parse_fen(perftcase.fen);
         uint64_t result = run_perft(perftcase.depth);
         if (result != perftcase.expected) {
-            std::cerr << "[FAIL]\n";
+            std::cerr << "\n[FAIL]\n";
             std::cerr << "expected: " << perftcase.expected << "\n";
             std::cerr << "result: " << result << "\n";
-            success = false;
+            return false;
         }
 
         progress++;
     }
-    std::cout << "\rTest running: 100.0%\n";
 
     auto t1 = std::chrono::steady_clock::now();
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
 
-    if (success) {
-        std::cout << cases.size() << " cases cleared in " << ms << " ms.\n";
-    }
+    std::cout << "\rTest running: 100.0%\n";
+    std::cout << cases.size() << " cases cleared in " << ms << " ms.\n";
 
-    return success;
+    return true;
 }
 
 int main (int argc, char* argv[]) {
@@ -134,20 +131,20 @@ int main (int argc, char* argv[]) {
         if (run_test("./standard_test.epd")) {
             std::cout << "[+] Standard test passed.\n";
         } else {
-            std::cout << "[+] Standard test failed.\n";
+            std::cout << "[X] Standard test failed.\n";
         }
     } else if (command == "--stress") {
         if (run_test("./stress_test.epd")) {
             std::cout << "[+] Stress test passed.\n";
         } else {
-            std::cout << "[+] Stress test failed.\n";
+            std::cout << "[X] Stress test failed.\n";
         }
     } else if (command == "--manual") {
         std::string filepath = argv[2];
         if (run_test(filepath)) {
             std::cout << "[+] Manual test passed.\n";
         } else {
-            std::cout << "[+] Manual test failed.\n";
+            std::cout << "[X] Manual test failed.\n";
         }
     } else {
         std::cerr << "Unknown command.\n";
