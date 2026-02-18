@@ -10,5 +10,12 @@ int main (void) {
         return EXIT_FAILURE;
     }
 
+    if (run_rook_move_gen_test()) {
+        std::cout << "[+] Rook move gen test passed.\n";
+    } else {
+        std::cout << "[X] Rook move gen test failed.\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }

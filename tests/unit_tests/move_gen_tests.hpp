@@ -13,3 +13,4 @@
 #include "move_test_case.hpp"
 
 bool run_pawn_move_gen_test ();
+bool run_rook_move_gen_test ();
