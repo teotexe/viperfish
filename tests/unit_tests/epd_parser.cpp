@@ -15,8 +15,14 @@ void parse_epd (const std::string &filepath, std::vector<MoveTestCase> &cases) {
 
         testcase.fen = line.substr(start, split_pos - start);
 
-        start = line.find(' ', split_pos) + 1;
+        if (line.find('N', split_pos) != std::string::npos) {
+            cases.emplace_back(testcase);
+            continue;
+        }
+
+        start = line.find(' ', split_pos);
         if (start == std::string::npos) continue;
+        start++;
 
         move mv;
         while ((split_pos = line.find(' ', start)) != std::string::npos) {

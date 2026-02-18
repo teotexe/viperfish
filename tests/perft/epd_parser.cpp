@@ -15,8 +15,10 @@ void parse_epd (const std::string &filepath, std::vector<PerftCase> &cases) {
 
         perftcase.fen = line.substr(start, split_pos - start);
 
-        start = line.find('D', split_pos) + 1;
+        start = line.find('D', split_pos);
         if (start == std::string::npos) continue;
+        start++;
+
         split_pos = line.find(' ', start);
         if (split_pos == std::string::npos) continue;
 
