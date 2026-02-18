@@ -15,32 +15,25 @@ bool compare_moves (std::vector<move> expected, Moves move_list) {
     return true;
 }
 
-// To revise
 void move_gen_setup () {
-    find_checkers(!stm);
     pawn_mv_mask = 0ULL;
 
-    if (stm == white) {
-        if (countbits(checkers) == 1) {
-            square king_sq = getls1b(bitboards[K]);
-            square checker_sq = getls1b(checkers);
-            legal_mv_mask = blocker_tables[king_sq][checker_sq] | checkers;
+    find_checkers(!stm);
+    if (countbits(checkers) == 1) {
+        square king_sq = getls1b(bitboards[(stm == white) ? K : k]);
+        square checker_sq = getls1b(checkers);
+        legal_mv_mask = blocker_tables[king_sq][checker_sq] | checkers;
+
+        if (stm == white) {
             if (enpassant != no_sq && (1ULL << (enpassant - 8)) & checkers) pawn_mv_mask |= (1ULL << enpassant);
         } else {
-            legal_mv_mask = 0xFFFFFFFFFFFFFFFFULL;
-        }
-        pawn_mv_mask |= legal_mv_mask;
-    } else {
-        if (countbits(checkers) == 1) {
-            square king_sq = getls1b(bitboards[k]);
-            square checker_sq = getls1b(checkers);
-            legal_mv_mask = blocker_tables[king_sq][checker_sq] | checkers;
             if (enpassant != no_sq && (1ULL << (enpassant + 8)) & checkers) pawn_mv_mask |= (1ULL << enpassant);
-        } else {
-            legal_mv_mask = 0xFFFFFFFFFFFFFFFFULL;
         }
-        pawn_mv_mask |= legal_mv_mask;
+    } else {
+        legal_mv_mask = 0xFFFFFFFFFFFFFFFFULL;
     }
+
+    pawn_mv_mask |= legal_mv_mask;
 
     find_pins(stm);
 }
@@ -70,6 +63,15 @@ bool run_pawn_move_gen_test () {
         } else {
             generate_moves_black_pawn(move_list);
         }
+
+        // std::cout << "\nsize: " << move_list.index << "\n";
+        // for (uint8_t i = 0; i < move_list.index; i++) {
+        //     std::cout << "mv: " << move_list.moves[i] << "\n";
+        // }
+
+        // for (auto &e : testcase.moves) {
+        //     std::cout << "mv: " << e << "\n";
+        // }
 
         if (!compare_moves(testcase.moves, move_list)) {
             std::cerr << "\n[FAIL]\n";
