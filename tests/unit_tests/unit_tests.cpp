@@ -17,5 +17,12 @@ int main (void) {
         return EXIT_FAILURE;
     }
 
+    if (run_knight_move_gen_test()) {
+        std::cout << "[+] Knight move gen test passed.\n";
+    } else {
+        std::cout << "[X] Knight move gen test failed.\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
