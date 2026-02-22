@@ -24,5 +24,12 @@ int main (void) {
         return EXIT_FAILURE;
     }
 
+    if (run_bishop_move_gen_test()) {
+        std::cout << "[+] Bishop move gen test passed.\n";
+    } else {
+        std::cout << "[X] Bishop move gen test failed.\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
