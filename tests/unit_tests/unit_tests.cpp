@@ -38,5 +38,12 @@ int main (void) {
         return EXIT_FAILURE;
     }
 
+    if (run_queen_move_gen_test()) {
+        std::cout << "[+] Queen move gen test passed.\n";
+    } else {
+        std::cout << "[X] Queen move gen test failed.\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }

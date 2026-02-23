@@ -17,3 +17,4 @@ bool run_rook_move_gen_test ();
 bool run_knight_move_gen_test ();
 bool run_bishop_move_gen_test ();
 bool run_king_move_gen_test ();
+bool run_queen_move_gen_test ();
