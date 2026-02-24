@@ -285,11 +285,12 @@ bool run_queen_move_gen_test () {
 bool run_sq_att_detection_test () {
     std::string fen = "r1b1kb2/ppp1np2/n1q3p1/3pp2r/3P2Bp/1PQ1PNP1/PBPN1P1P/R4KR1 w q - 0 1";
     parse_fen(fen);
-    square attacked_squares[2][9] = {
+
+    std::vector<std::vector<square>> attacked_squares = {
         {d1, e4, a3, a5, e2, c8, g5, g2, a4},
         {g5, g8, g7, d8, b5, g4, b4, b8, g3},
     };
-    square safe_squares[2][9] = {
+    std::vector<std::vector<square>> safe_squares = {
         {c7, a7, f8, f6, b6, d5, g6, b5, d8},
         {c2, b3, a3, d3, a5, h3, f3, e3, c1},
     };
@@ -307,7 +308,45 @@ bool run_sq_att_detection_test () {
             }
         }
     }
+    std::cout << "\rTest running: 25.0%";
+
+    for (state side = white; side <= black; side++) {
+        for (square sq : safe_squares[side]) {
+            if (is_sq_attacked(side, sq)) {
+                std::cerr << "\n[FAIL]\n";
+                std::cerr << "Failed test case: " << fen << "\n";
+                std::cerr << "Square: " << hr_squares[sq] << "\n";
+                return false;
+            }
+        }
+    }
     std::cout << "\rTest running: 50.0%";
+
+    attacked_squares.clear();
+    safe_squares.clear();
+
+    fen = "r2k1b1r/p1pp4/b2qpppn/nN1PN3/1p2P2p/5Q1P/PPP1BPP1/R1B2K1R w - - 0 1";
+    parse_fen(fen);
+    attacked_squares = {
+        {b1, a7, d2, h5, e1, c4, f7, h2, e6},
+        {h7, f7, g7, c5, e8, b5, b3, b8, g3},
+    };
+    safe_squares = {
+        {b6, a6, b7, e7, b8, c5, g7, h7, c8},
+        {a2, f4, h3, e3, d4, a4, d1, h2, g1},
+    };
+
+    for (state side = white; side <= black; side++) {
+        for (square sq : attacked_squares[side]) {
+            if (!is_sq_attacked(side, sq)) {
+                std::cerr << "\n[FAIL]\n";
+                std::cerr << "Failed test case: " << fen << "\n";
+                std::cerr << "Square: " << hr_squares[sq] << "\n";
+                return false;
+            }
+        }
+    }
+    std::cout << "\rTest running: 75.0%";
 
     for (state side = white; side <= black; side++) {
         for (square sq : safe_squares[side]) {
