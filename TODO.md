@@ -5,4 +5,5 @@
 - Attack struct with all the attack tables and methods?
 - Namespaces (?)
 - Refactoring
+- One bash script that compiles the main executables, creates a bin dir and sets up all the needed symlinks
 - UCI Protocol
