@@ -171,24 +171,17 @@ private:
     alignas(64) static bboard bishop_att[64][512];
     alignas(64) static bboard rook_att[64][4096];
 
-    static void init_pawn_attacks (bboard (&bb)[2][64]);
-    static void init_knight_attacks (bboard (&bb)[64]);
-    static void init_king_attacks (bboard (&bb)[64]);
-    static void init_bishop_masks (bboard (&bb)[64]);
-    static void init_rook_masks (bboard (&bb)[64]);
-    static void init_bishop_attacks (bboard (&bb)[64][512]);
-    static void init_rook_attacks (bboard (&bb)[64][4096]);
+    static void init_pawn_attacks ();
+    static void init_knight_attacks ();
+    static void init_king_attacks ();
+    static void init_bishop_masks ();
+    static void init_rook_masks ();
+    static void init_bishop_attacks ();
+    static void init_rook_attacks ();
 
+    Attacks() = delete;
 public:
-    static void init () {
-        init_pawn_attacks(pawn_att);
-        init_knight_attacks(knight_att);
-        init_king_attacks(king_att);
-        init_bishop_masks(bishop_masks);
-        init_rook_masks(rook_masks);
-        init_bishop_attacks(bishop_att);
-        init_rook_attacks(rook_att);
-    }
+    static void init ();
 
     static __always_inline bboard pawn (square sq, state side) {
         return pawn_att[side][sq];
