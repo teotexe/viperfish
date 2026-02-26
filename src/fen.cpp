@@ -112,7 +112,7 @@ bool set_board (const std::string &board) {
 
             if (is_piece(ch)) {
                 piece pc = char_to_piece(ch);
-                setbit(bitboards[pc], sq);
+                setbit(pos.bitboards[pc], sq);
             } else if ('1' <= ch && ch <= '8') {
                 uint8_t offset = ch - '0';
                 f += offset - 1;
@@ -142,13 +142,13 @@ bool set_castling_rights (const std::string &castling_rights) {
 
         switch (ch) {
             case 'K':
-                castling |= wk; break;
+                pos.castling |= wk; break;
             case 'Q':
-                castling |= wq; break;
+                pos.castling |= wq; break;
             case 'k':
-                castling |= bk; break;
+                pos.castling |= bk; break;
             case 'q':
-                castling |= bq; break;
+                pos.castling |= bq; break;
             default:
                 break;
         }
@@ -160,14 +160,14 @@ bool set_castling_rights (const std::string &castling_rights) {
 // Set en passant according to the corresponding FEN field
 bool set_en_passant (const std::string &en_passant) {
     if (en_passant == "-") {
-        enpassant = no_sq;
+        pos.enpassant = no_sq;
     } else if (en_passant.length() != 2
                 || !('a' <= en_passant[0] && en_passant[0] <= 'h')
                 || !('1' <= en_passant[1] && en_passant[1] <= '8')) {
         std::cerr << "Invalid en passant square.\n";
         return false;
     } else {
-        enpassant = str_to_sq(en_passant);
+        pos.enpassant = str_to_sq(en_passant);
     }
 
     return true;
@@ -177,13 +177,13 @@ bool set_en_passant (const std::string &en_passant) {
 // Invalid FEN strings generate an error but make the board state invalid
 void parse_fen (const std::string &position) {
     // Reset state variables
-    memset(bitboards, 0ULL, sizeof(bitboards));
-    memset(occupancies, 0ULL, sizeof(occupancies));
-    stm = 0;
-    enpassant = no_sq;
-    castling = 0;
-    hmclock = 0;
-    fmclock = 0;
+    memset(pos.bitboards, 0ULL, sizeof(pos.bitboards));
+    memset(pos.occupancies, 0ULL, sizeof(pos.occupancies));
+    pos.stm = 0;
+    pos.enpassant = no_sq;
+    pos.castling = 0;
+    pos.hmclock = 0;
+    pos.fmclock = 0;
 
     std::string side_to_move;
     std::string board;
@@ -211,7 +211,7 @@ void parse_fen (const std::string &position) {
         return;
     }
 
-    stm = (side_to_move == "w") ? white : black;
+    pos.stm = (side_to_move == "w") ? white : black;
 
     if (!set_board(board)) {
         parse_fen(starting_pos);
@@ -234,7 +234,7 @@ void parse_fen (const std::string &position) {
         parse_fen(starting_pos);
         return;
     }
-    hmclock = half_move_clock;
+    pos.hmclock = half_move_clock;
 
     uint16_t full_move_clock = str_to_int(fm_clock);
     if (full_move_clock < 0) {
@@ -242,14 +242,14 @@ void parse_fen (const std::string &position) {
         parse_fen(starting_pos);
         return;
     }
-    fmclock = full_move_clock;
+    pos.fmclock = full_move_clock;
 
     // Update occupancies
     for (piece pc = P; pc <= Q; pc++) {
-        occupancies[white] |= bitboards[pc];
+        pos.occupancies[white] |= pos.bitboards[pc];
     }
     for (piece pc = p; pc <= q; pc++) {
-        occupancies[black] |= bitboards[pc];
+        pos.occupancies[black] |= pos.bitboards[pc];
     }
-    occupancies[both] |= occupancies[white] | occupancies[black];
+    pos.occupancies[both] |= pos.occupancies[white] | pos.occupancies[black];
 }

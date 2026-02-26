@@ -21,7 +21,7 @@ bool run_fen_tests () {
     };
 
     for (piece pc = P; pc <= q; pc++) {
-        if (bitboards[pc] == expected_starting[pc]) {
+        if (pos.bitboards[pc] == expected_starting[pc]) {
             std::cout << "[PASS]\n";
         } else {
             std::cout << "[FAIL]\n";
@@ -29,14 +29,14 @@ bool run_fen_tests () {
         }
     }
 
-    if (stm == white && castling == 15 && enpassant == no_sq) {
+    if (pos.stm == white && pos.castling == 15 && pos.enpassant == no_sq) {
         std::cout << "[PASS]\n";
     } else {
         std::cout << "[FAIL]\n";
         fail = true;
     }
 
-    if (hmclock == 0 && fmclock == 1) {
+    if (pos.hmclock == 0 && pos.fmclock == 1) {
         std::cout << "[PASS]\n";
     } else {
         std::cout << "[FAIL]\n";
@@ -60,24 +60,24 @@ bool run_fen_tests () {
     };
 
     for (piece pc = P; pc <= q; pc++) {
-        if (bitboards[pc] == expected_tricky[pc]) {
+        if (pos.bitboards[pc] == expected_tricky[pc]) {
             std::cout << "[PASS]\n";
         } else {
             std::cout << "[FAIL]\n";
             std::cout << "expected: " << expected_tricky[pc] << "\n";
-            std::cout << "actual: " << bitboards[pc] << "\n";
+            std::cout << "actual: " << pos.bitboards[pc] << "\n";
             fail = true;
         }
     }
 
-    if (stm == white && castling == 15 && enpassant == no_sq) {
+    if (pos.stm == white && pos.castling == 15 && pos.enpassant == no_sq) {
         std::cout << "[PASS]\n";
     } else {
         std::cout << "[FAIL]\n";
         fail = true;
     }
 
-    if (hmclock == 0 && fmclock == 1) {
+    if (pos.hmclock == 0 && pos.fmclock == 1) {
         std::cout << "[PASS]\n";
     } else {
         std::cout << "[FAIL]\n";

@@ -13,45 +13,47 @@ typedef struct {
     counter fmclock;
 } BoardState;
 
-extern bboard bitboards[12];
-extern bboard occupancies[3];
+extern BoardState pos;
+
+// extern bboard bitboards[12];
+// extern bboard occupancies[3];
 
 extern bboard checkers;
 extern bboard pins;
 
-extern flag castling;
+// extern flag castling;
 
-// Side to move
-extern state stm;
+// // Side to move
+// extern state stm;
 
-// En passant square
-extern square enpassant;
+// // En passant square
+// extern square enpassant;
 
-// Half move clock to enforce 50-move rule
-extern counter hmclock;
-// Full move clock to count the total number of moves
-extern counter fmclock;
+// // Half move clock to enforce 50-move rule
+// extern counter hmclock;
+// // Full move clock to count the total number of moves
+// extern counter fmclock;
 
 __always_inline void copy_board_state (BoardState &board) {
-    memcpy(board.bitboards, bitboards, 96);
-    memcpy(board.occupancies, occupancies, 24);
+    memcpy(board.bitboards, pos.bitboards, 96);
+    memcpy(board.occupancies, pos.occupancies, 24);
 
-    board.castling = castling;
-    board.enpassant = enpassant;
-    board.stm = stm;
+    board.castling = pos.castling;
+    board.enpassant = pos.enpassant;
+    board.stm = pos.stm;
 
-    board.hmclock = hmclock;
-    board.fmclock = fmclock;
+    board.hmclock = pos.hmclock;
+    board.fmclock = pos.fmclock;
 }
 
 __always_inline void restore_board_state (const BoardState &board) {
-    memcpy(bitboards, board.bitboards, 96);
-    memcpy(occupancies, board.occupancies, 24);
+    memcpy(pos.bitboards, board.bitboards, 96);
+    memcpy(pos.occupancies, board.occupancies, 24);
 
-    castling = board.castling;
-    enpassant = board.enpassant;
-    stm = board.stm;
+    pos.castling = board.castling;
+    pos.enpassant = board.enpassant;
+    pos.stm = board.stm;
 
-    hmclock = board.hmclock;
-    fmclock = board.fmclock;
+    pos.hmclock = board.hmclock;
+    pos.fmclock = board.fmclock;
 }

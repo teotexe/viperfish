@@ -15,14 +15,14 @@ void print_board () {
     for (int8_t rank = 7; rank >= 0; rank--) {
         for (int8_t file = 0; file <= 7; file++) {
             square sq = rank * 8 + file;
-            if (!getbit(occupancies[both], sq)) {
+            if (!getbit(pos.occupancies[both], sq)) {
                 std::cout << ".";
                 continue;
             }
 
             piece pc;
             for (piece candidate = P; candidate <= q; candidate++) {
-                if (getbit(bitboards[candidate], sq)) {
+                if (getbit(pos.bitboards[candidate], sq)) {
                     pc = candidate;
                     break;
                 }

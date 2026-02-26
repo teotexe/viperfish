@@ -18,16 +18,16 @@ bool compare_moves (std::vector<move> expected, Moves move_list) {
 void move_gen_setup () {
     pawn_mv_mask = 0ULL;
 
-    find_checkers(!stm);
+    find_checkers(!pos.stm);
     if (countbits(checkers) == 1) {
-        square king_sq = getls1b(bitboards[(stm == white) ? K : k]);
+        square king_sq = getls1b(pos.bitboards[(pos.stm == white) ? K : k]);
         square checker_sq = getls1b(checkers);
         legal_mv_mask = blocker_tables[king_sq][checker_sq] | checkers;
 
-        if (stm == white) {
-            if (enpassant != no_sq && (1ULL << (enpassant - 8)) & checkers) pawn_mv_mask |= (1ULL << enpassant);
+        if (pos.stm == white) {
+            if (pos.enpassant != no_sq && (1ULL << (pos.enpassant - 8)) & checkers) pawn_mv_mask |= (1ULL << pos.enpassant);
         } else {
-            if (enpassant != no_sq && (1ULL << (enpassant + 8)) & checkers) pawn_mv_mask |= (1ULL << enpassant);
+            if (pos.enpassant != no_sq && (1ULL << (pos.enpassant + 8)) & checkers) pawn_mv_mask |= (1ULL << pos.enpassant);
         }
     } else {
         legal_mv_mask = 0xFFFFFFFFFFFFFFFFULL;
@@ -35,7 +35,7 @@ void move_gen_setup () {
 
     pawn_mv_mask |= legal_mv_mask;
 
-    find_pins(stm);
+    find_pins(pos.stm);
 }
 
 bool run_pawn_move_gen_test () {
@@ -58,7 +58,7 @@ bool run_pawn_move_gen_test () {
         move_gen_setup();
 
         Moves move_list = {};
-        if (stm == white) {
+        if (pos.stm == white) {
             generate_moves_white_pawn(move_list);
         } else {
             generate_moves_black_pawn(move_list);
@@ -102,7 +102,7 @@ bool run_rook_move_gen_test () {
         move_gen_setup();
 
         Moves move_list = {};
-        generate_moves_rook(move_list, stm);
+        generate_moves_rook(move_list, pos.stm);
 
         if (!compare_moves(testcase.moves, move_list)) {
             std::cerr << "\n[FAIL]\n";
@@ -142,7 +142,7 @@ bool run_knight_move_gen_test () {
         move_gen_setup();
 
         Moves move_list = {};
-        generate_moves_knight(move_list, stm);
+        generate_moves_knight(move_list, pos.stm);
 
         if (!compare_moves(testcase.moves, move_list)) {
             std::cerr << "\n[FAIL]\n";
@@ -182,7 +182,7 @@ bool run_bishop_move_gen_test () {
         move_gen_setup();
 
         Moves move_list = {};
-        generate_moves_bishop(move_list, stm);
+        generate_moves_bishop(move_list, pos.stm);
 
         if (!compare_moves(testcase.moves, move_list)) {
             std::cerr << "\n[FAIL]\n";
@@ -222,7 +222,7 @@ bool run_king_move_gen_test () {
         move_gen_setup();
 
         Moves move_list = {};
-        generate_moves_king(move_list, stm);
+        generate_moves_king(move_list, pos.stm);
 
         if (!compare_moves(testcase.moves, move_list)) {
             std::cerr << "\n[FAIL]\n";
@@ -262,7 +262,7 @@ bool run_queen_move_gen_test () {
         move_gen_setup();
 
         Moves move_list = {};
-        generate_moves_queen(move_list, stm);
+        generate_moves_queen(move_list, pos.stm);
 
         if (!compare_moves(testcase.moves, move_list)) {
             std::cerr << "\n[FAIL]\n";
@@ -463,7 +463,7 @@ bool run_pin_detection_test () {
     fen = "5k2/8/8/1KpP3r/8/8/8/8 w - c6 0 1";
     parse_fen(fen);
     find_pins(white);
-    if (enpassant != no_sq) {
+    if (pos.enpassant != no_sq) {
         std::cerr << "\n[FAIL]\n";
         std::cerr << "Failed test case: " << fen << "\n";
         return false;
@@ -473,7 +473,7 @@ bool run_pin_detection_test () {
     fen = "8/8/8/8/1k1pP2R/8/8/6K1 b - e3 0 1";
     parse_fen(fen);
     find_pins(black);
-    if (enpassant != no_sq) {
+    if (pos.enpassant != no_sq) {
         std::cerr << "\n[FAIL]\n";
         std::cerr << "Failed test case: " << fen << "\n";
         return false;
