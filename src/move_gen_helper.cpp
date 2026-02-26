@@ -1,17 +1,17 @@
 #include "move_gen_helper.hpp"
 
-bboard blocker_tables[64][64];
-bboard legal_mv_mask;
-bboard pawn_mv_mask;
-bboard pin_mask[64];
+Type::bboard blocker_tables[64][64];
+Type::bboard legal_mv_mask;
+Type::bboard pawn_mv_mask;
+Type::bboard pin_mask[64];
 
-void create_blocker_tables (bboard (&bb)[64][64]) {
-    for (square sq = a1; sq <= h8; sq++) {
+void create_blocker_tables (Type::bboard (&bb)[64][64]) {
+    for (Type::square sq = a1; sq <= h8; sq++) {
         int8_t rank = getrank(sq);
         int8_t file = getfile(sq);
 
         // Bishop blocker moves
-        bboard bits_inbetween = 0ULL;
+        Type::bboard bits_inbetween = 0ULL;
         for (int8_t r = rank - 2, f = file - 2; r >= 0 && f >= 0; r--, f--) {
             bits_inbetween |= (1ULL << ((r + 1) * 8 + (f + 1)));
             bb[sq][r * 8 + f] |= bits_inbetween;

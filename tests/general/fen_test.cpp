@@ -5,7 +5,7 @@ bool run_fen_tests () {
     bool fail = false;
 
     parse_fen(starting_pos);
-    bboard expected_starting[12] = {
+    Type::bboard expected_starting[12] = {
         0x000000000000FF00ULL,
         0x0000000000000081ULL,
         0x0000000000000042ULL,
@@ -20,7 +20,7 @@ bool run_fen_tests () {
         0x0800000000000000ULL,
     };
 
-    for (piece pc = P; pc <= q; pc++) {
+    for (Type::piece pc = P; pc <= q; pc++) {
         if (pos.bitboards[pc] == expected_starting[pc]) {
             std::cout << "[PASS]\n";
         } else {
@@ -44,7 +44,7 @@ bool run_fen_tests () {
     }
 
     parse_fen(tricky_pos);
-    bboard expected_tricky[12] = {
+    Type::bboard expected_tricky[12] = {
         0x000000081000E700ULL,
         0x0000000000000081ULL,
         0x0000001000040000ULL,
@@ -59,7 +59,7 @@ bool run_fen_tests () {
         0x0010000000000000ULL,
     };
 
-    for (piece pc = P; pc <= q; pc++) {
+    for (Type::piece pc = P; pc <= q; pc++) {
         if (pos.bitboards[pc] == expected_tricky[pc]) {
             std::cout << "[PASS]\n";
         } else {

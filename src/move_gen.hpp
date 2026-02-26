@@ -28,8 +28,8 @@ __always_inline void generate_moves (Moves &move_list) {
         }
 
         if (countbits(checkers) == 1) {
-            square king_sq = getls1b(pos.bitboards[K]);
-            square checker_sq = getls1b(checkers);
+            Type::square king_sq = getls1b(pos.bitboards[K]);
+            Type::square checker_sq = getls1b(checkers);
             legal_mv_mask = blocker_tables[king_sq][checker_sq] | checkers;
             if (pos.enpassant != no_sq && (1ULL << (pos.enpassant - 8)) & checkers) pawn_mv_mask |= (1ULL << pos.enpassant);
         } else {
@@ -40,7 +40,7 @@ __always_inline void generate_moves (Moves &move_list) {
         // Compute pins and pins_mask
         find_pins(pos.stm);
 
-        for (piece curr_piece = P; curr_piece <= Q; curr_piece++) {
+        for (Type::piece curr_piece = P; curr_piece <= Q; curr_piece++) {
             if (curr_piece == P) {
                 generate_moves_white_pawn(move_list);
             }
@@ -67,8 +67,8 @@ __always_inline void generate_moves (Moves &move_list) {
         }
 
         if (countbits(checkers) == 1) {
-            square king_sq = getls1b(pos.bitboards[k]);
-            square checker_sq = getls1b(checkers);
+            Type::square king_sq = getls1b(pos.bitboards[k]);
+            Type::square checker_sq = getls1b(checkers);
             legal_mv_mask = blocker_tables[king_sq][checker_sq] | checkers;
             if (pos.enpassant != no_sq && (1ULL << (pos.enpassant + 8)) & checkers) pawn_mv_mask |= (1ULL << pos.enpassant);
         } else {
@@ -79,7 +79,7 @@ __always_inline void generate_moves (Moves &move_list) {
         // Compute pins and pins_mask
         find_pins(pos.stm);
 
-        for (piece curr_piece = p; curr_piece <= q; curr_piece++) {
+        for (Type::piece curr_piece = p; curr_piece <= q; curr_piece++) {
             if (curr_piece == p) {
                 generate_moves_black_pawn(move_list);
             }
@@ -104,18 +104,18 @@ __always_inline void generate_moves (Moves &move_list) {
 
 // Make one move
 __always_inline int make_move (int move) {
-    square source = get_mv_src(move);
-    square target = get_mv_trgt(move);
-    piece curr_piece = get_mv_piece(move);
-    piece promoted = get_mv_prmtd(move);
-    flag capture = get_mv_cptr(move);
-    flag double_move = get_mv_dblpsh(move);
-    flag en_passant_move = get_mv_enpsnt(move);
-    flag castling_flag = get_mv_cstlng(move);
+    Type::square source = get_mv_src(move);
+    Type::square target = get_mv_trgt(move);
+    Type::piece curr_piece = get_mv_piece(move);
+    Type::piece promoted = get_mv_prmtd(move);
+    bool capture = get_mv_cptr(move);
+    bool double_move = get_mv_dblpsh(move);
+    bool en_passant_move = get_mv_enpsnt(move);
+    bool castling_flag = get_mv_cstlng(move);
 
-    // Refs to occupancies bboards
-    bboard *own_occ = &pos.occupancies[pos.stm];
-    bboard *opp_occ = &pos.occupancies[!pos.stm];
+    // Refs to occupancies bitboards
+    Type::bboard *own_occ = &pos.occupancies[pos.stm];
+    Type::bboard *opp_occ = &pos.occupancies[!pos.stm];
 
     // Move the piece
     popbit(pos.bitboards[curr_piece], source);
@@ -137,9 +137,9 @@ __always_inline int make_move (int move) {
         // Find the opponent's piece on the capture square and remove it
 
         // Loop over opposite side's pieces
-        piece start = (pos.stm == white) ? p : P;
-        piece end   = (pos.stm == white) ? q : Q;
-        for (piece pc = start; pc <= end; pc++) {
+        Type::piece start = (pos.stm == white) ? p : P;
+        Type::piece end   = (pos.stm == white) ? q : Q;
+        for (Type::piece pc = start; pc <= end; pc++) {
             if (getbit(pos.bitboards[pc], cap_sq)) {
                 popbit(pos.bitboards[pc], cap_sq);
                 break;
@@ -149,7 +149,7 @@ __always_inline int make_move (int move) {
 
     // Handle promotion
     if (promoted) {
-        piece pawn = (pos.stm == white) ? P : p;
+        Type::piece pawn = (pos.stm == white) ? P : p;
         
         // Remove the pawn
         popbit(pos.bitboards[pawn], target);

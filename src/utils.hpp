@@ -3,13 +3,14 @@
 #include <cstdint>
 #include <string>
 
-using bboard = uint64_t;
-using state = uint8_t;
-using square = uint8_t;
-using counter = uint16_t;
-using flag = uint8_t;
-using piece = uint8_t;
-using move = uint32_t;
+namespace Type {
+    using bboard = uint64_t;
+    using side = uint8_t;
+    using square = uint8_t;
+    using counter = uint16_t;
+    using piece = uint8_t;
+    using move = uint32_t;
+};
 
 enum { white, black, both };
 enum { wk = 1, wq = 2, bk = 4, bq = 8 };
@@ -29,13 +30,13 @@ enum {
 };
 
 // Not A file mask bitboard
-constexpr bboard not_a_file = 18374403900871474942ULL;
+constexpr Type::bboard not_a_file = 18374403900871474942ULL;
 // Not H file mask bitboard
-constexpr bboard not_h_file = 9187201950435737471ULL;
+constexpr Type::bboard not_h_file = 9187201950435737471ULL;
 // Not A, B files mask bitboard
-constexpr bboard not_ab_files = 18229723555195321596ULL;
+constexpr Type::bboard not_ab_files = 18229723555195321596ULL;
 // Not H, G files mask bitboard
-constexpr bboard not_gh_files = 4557430888798830399ULL;
+constexpr Type::bboard not_gh_files = 4557430888798830399ULL;
 
 constexpr const char* starting_pos = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 constexpr const char* tricky_pos = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1";
@@ -57,5 +58,5 @@ constexpr const char *hr_squares[] = {
     "a8", "b8", "c8", "d8", "e8", "f8", "g8", "h8",
 };
 
-int8_t getrank (square sq);
-int8_t getfile (square sq);
+int8_t getrank (Type::square sq);
+int8_t getfile (Type::square sq);

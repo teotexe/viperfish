@@ -4,7 +4,7 @@ bool run_bit_manip_tests () {
     std::cout << "[?] BIT MANIPULATION TESTS RUNNING\n"; 
     bool fail = false;
 
-    bboard bb = 0ULL;
+    Type::bboard bb = 0ULL;
     setbit(bb, 0);
     if (getbit(bb, 0) == true) {
         std::cout << "[PASS]\n";

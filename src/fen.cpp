@@ -1,11 +1,11 @@
 #include "fen.hpp"
 
 const std::string pieces = "PRNBKQprnbkq";
-constexpr piece NO_PIECE = 255;
+constexpr Type::piece NO_PIECE = 255;
 
 // Convert a character to its corresponding piece
-piece char_to_piece (char ch) {
-    piece pc = NO_PIECE;
+Type::piece char_to_piece (char ch) {
+    Type::piece pc = NO_PIECE;
 
     switch (ch) {
         case 'P':
@@ -41,7 +41,7 @@ piece char_to_piece (char ch) {
 }
 
 // Convert a string to its corresponding square
-square str_to_sq (const std::string &str) {
+Type::square str_to_sq (const std::string &str) {
     assert(str.length() == 2);
 
     return (str[1] - '1') * 8 + (str[0] - 'a');
@@ -55,7 +55,7 @@ bool is_piece (char character) {
 // Convert a string to an integer
 // Return -1 if conversion fails
 int16_t str_to_int (const std::string &str) {
-    counter cnt = 0;
+    int16_t cnt = 0;
     for (char ch : str) {
         if (isdigit(ch)) {
             cnt = cnt * 10 + (ch - '0');
@@ -70,7 +70,7 @@ int16_t str_to_int (const std::string &str) {
 // Split FEN string in different fields
 bool split_str (const std::string &position, std::string &side_to_move, std::string &board,
     std::string &castling_rights, std::string &en_passant, std::string &hm_clock, std::string &fm_clock) {
-    counter cnt = 0;
+    int8_t cnt = 0;
     std::string fields[6];
     size_t start = 0, end;
 
@@ -107,11 +107,11 @@ bool set_board (const std::string &board) {
     uint8_t chindex = 0;
     for (int8_t r = 7; r >= 0; r--) {
         for (int8_t f = 0; f <= 7; f++) {
-            square sq = r * 8 + f;
+            Type::square sq = r * 8 + f;
             char ch = board[chindex];
 
             if (is_piece(ch)) {
-                piece pc = char_to_piece(ch);
+                Type::piece pc = char_to_piece(ch);
                 setbit(pos.bitboards[pc], sq);
             } else if ('1' <= ch && ch <= '8') {
                 uint8_t offset = ch - '0';
@@ -245,10 +245,10 @@ void parse_fen (const std::string &position) {
     pos.fmclock = full_move_clock;
 
     // Update occupancies
-    for (piece pc = P; pc <= Q; pc++) {
+    for (Type::piece pc = P; pc <= Q; pc++) {
         pos.occupancies[white] |= pos.bitboards[pc];
     }
-    for (piece pc = p; pc <= q; pc++) {
+    for (Type::piece pc = p; pc <= q; pc++) {
         pos.occupancies[black] |= pos.bitboards[pc];
     }
     pos.occupancies[both] |= pos.occupancies[white] | pos.occupancies[black];

@@ -4,13 +4,13 @@
 #include <cstring>
 
 typedef struct {
-    bboard bitboards[12];
-    bboard occupancies[3];
-    flag castling;
-    state stm;
-    square enpassant;
-    counter hmclock;
-    counter fmclock;
+    Type::bboard bitboards[12];
+    Type::bboard occupancies[3];
+    uint8_t castling;
+    Type::side stm;
+    Type::square enpassant;
+    Type::counter hmclock;
+    Type::counter fmclock;
 } BoardState;
 
 extern BoardState pos;
@@ -18,8 +18,8 @@ extern BoardState pos;
 // extern bboard bitboards[12];
 // extern bboard occupancies[3];
 
-extern bboard checkers;
-extern bboard pins;
+extern Type::bboard checkers;
+extern Type::bboard pins;
 
 // extern flag castling;
 

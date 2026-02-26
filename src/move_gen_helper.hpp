@@ -8,7 +8,7 @@
 #include "debug.hpp"
 
 typedef struct {
-    move moves[256];
+    Type::move moves[256];
     // It could theoretically overflow but the maximum
     // number of moves in one round does not reach 256
     uint8_t nextindex;
@@ -17,29 +17,29 @@ typedef struct {
         return nextindex;
     }
 
-    __always_inline void add (const move &mv) {
+    __always_inline void add (const Type::move &mv) {
         moves[nextindex] = mv;
         nextindex++;
     }
 
-    __always_inline move operator [] (uint8_t index) {
+    __always_inline Type::move operator [] (uint8_t index) {
         return moves[index];
     }
 
-    __always_inline move* begin () {
+    __always_inline Type::move* begin () {
         return &moves[0];
     }
 
-    __always_inline move* end () {
+    __always_inline Type::move* end () {
         return &moves[nextindex];
     }
 
 } Moves;
 
-extern bboard blocker_tables[64][64];
-extern bboard legal_mv_mask;
-extern bboard pawn_mv_mask;
-extern bboard pin_mask[64];
+extern Type::bboard blocker_tables[64][64];
+extern Type::bboard legal_mv_mask;
+extern Type::bboard pawn_mv_mask;
+extern Type::bboard pin_mask[64];
 
 // Binary move's representation:
 
@@ -61,70 +61,70 @@ constexpr uint32_t double_push_flag_mask = 0x200000;
 constexpr uint32_t en_passant_flag_mask = 0x400000;
 constexpr uint32_t castling_flag_mask = 0x800000;
 
-__always_inline square get_mv_src (move mv) {
+__always_inline Type::square get_mv_src (Type::move mv) {
     return mv & source_sq_mask;
 }
 
-__always_inline square get_mv_trgt (move mv) {
+__always_inline Type::square get_mv_trgt (Type::move mv) {
     return (mv & target_sq_mask) >> 6;
 }
 
-__always_inline piece get_mv_piece (move mv) {
+__always_inline Type::piece get_mv_piece (Type::move mv) {
     return (mv & piece_mask) >> 12;
 }
 
-__always_inline piece get_mv_prmtd (move mv) {
+__always_inline Type::piece get_mv_prmtd (Type::move mv) {
     return (mv & promoted_piece_mask) >> 16;
 }
 
-__always_inline flag get_mv_cptr (move mv) {
+__always_inline bool get_mv_cptr (Type::move mv) {
     return (mv & capture_flag_mask) >> 20;
 }
 
-__always_inline flag get_mv_dblpsh (move mv) {
+__always_inline bool get_mv_dblpsh (Type::move mv) {
     return (mv & double_push_flag_mask) >> 21;
 }
 
-__always_inline flag get_mv_enpsnt (move mv) {
+__always_inline bool get_mv_enpsnt (Type::move mv) {
     return (mv & en_passant_flag_mask) >> 22;
 }
 
-__always_inline flag get_mv_cstlng (move mv) {
+__always_inline bool get_mv_cstlng (Type::move mv) {
     return (mv & castling_flag_mask) >> 23;
 }
 
-void create_blocker_tables (bboard (&bb)[64][64]);
+void create_blocker_tables (Type::bboard (&bb)[64][64]);
 
 // Handles pinned pieces
 // pins: bitboard of the pieces pinned by the opponent
 // pins_mask: mask to allow moving pinned piece only in pin's direction
-__always_inline void find_pins(state side) {
+__always_inline void find_pins(Type::side side) {
     pins = 0ULL;
-    square king_sq = getls1b(pos.bitboards[(side == white) ? K : k]);
+    Type::square king_sq = getls1b(pos.bitboards[(side == white) ? K : k]);
 
     // Get all possible opponents pinners (slider pieces)
-    bboard bishop_like = (side == white) 
+    Type::bboard bishop_like = (side == white) 
         ? (pos.bitboards[b] | pos.bitboards[q]) 
         : (pos.bitboards[B] | pos.bitboards[Q]);
-    bboard rook_like = (side == white) 
+    Type::bboard rook_like = (side == white) 
         ? (pos.bitboards[r] | pos.bitboards[q]) 
         : (pos.bitboards[R] | pos.bitboards[Q]);
-    bboard opponents = (bishop_like & Attacks::bishop(king_sq, 0ULL)) | (rook_like & Attacks::rook(king_sq, 0ULL));
+    Type::bboard opponents = (bishop_like & Attacks::bishop(king_sq, 0ULL)) | (rook_like & Attacks::rook(king_sq, 0ULL));
 
     // For each potential pinner
     while (opponents) {
-        square pinner_sq = getls1b(opponents);
+        Type::square pinner_sq = getls1b(opponents);
         popbit(opponents, pinner_sq);
 
         // Check if it's in diagonal or line of king
-        bboard between = blocker_tables[pinner_sq][king_sq];
+        Type::bboard between = blocker_tables[pinner_sq][king_sq];
         if (!between) continue;
 
         // Find pieces in between
-        bboard blockers = between & pos.occupancies[both];
+        Type::bboard blockers = between & pos.occupancies[both];
         // If any && it's only one
         if (blockers && ((blockers & (blockers - 1ULL)) == 0ULL)) {
-            square blocker_sq = getls1b(blockers);
+            Type::square blocker_sq = getls1b(blockers);
 
             // Check if is a friendly piece
             if (getbit(pos.occupancies[side], blocker_sq)) {
@@ -133,16 +133,16 @@ __always_inline void find_pins(state side) {
             }
         }
 
-        bboard white_blocker_pawns = blockers & pos.bitboards[P];
-        bboard black_blocker_pawns = blockers & pos.bitboards[p];
+        Type::bboard white_blocker_pawns = blockers & pos.bitboards[P];
+        Type::bboard black_blocker_pawns = blockers & pos.bitboards[p];
         if (countbits(blockers) == 2 && countbits(white_blocker_pawns) == 1 && countbits(black_blocker_pawns) == 1) {
             if (side == white) {
-                square blocker_sq = getls1b(white_blocker_pawns);
+                Type::square blocker_sq = getls1b(white_blocker_pawns);
                 if (pos.enpassant != no_sq && (Attacks::pawn(blocker_sq, white) & (1ULL << pos.enpassant)) && (1ULL << (pos.enpassant - 8)) & black_blocker_pawns) {
                     pos.enpassant = no_sq;
                 }
             } else {
-                square blocker_sq = getls1b(black_blocker_pawns);
+                Type::square blocker_sq = getls1b(black_blocker_pawns);
                 if (pos.enpassant != no_sq && (Attacks::pawn(blocker_sq, black) & (1ULL << pos.enpassant)) && ((1ULL << (pos.enpassant + 8)) & white_blocker_pawns)) {
                     pos.enpassant = no_sq;
                 }
@@ -152,9 +152,9 @@ __always_inline void find_pins(state side) {
 }
 
 // Generate a bitboard of pieces (of the given side) that are checking the king
-__always_inline void find_checkers (state side) {
+__always_inline void find_checkers (Type::side side) {
     checkers = 0ULL;
-    square sq = getls1b(pos.bitboards[(side == white) ? k : K]);
+    Type::square sq = getls1b(pos.bitboards[(side == white) ? k : K]);
 
     // White pawns (attackers)
     if (side == white) {
@@ -176,7 +176,7 @@ __always_inline void find_checkers (state side) {
 }
 
 // Check if the current given square is attacked by the current given side
-__always_inline bool is_sq_attacked (state side, square sq) {
+__always_inline bool is_sq_attacked (Type::side side, Type::square sq) {
     // Attacked by white pawns
     if ((side == white) && (Attacks::pawn(sq, black) & pos.bitboards[P])) {
         return true;
@@ -215,8 +215,8 @@ __always_inline bool is_sq_attacked (state side, square sq) {
     return false;
 }
 
-__always_inline move encode_move (square source, square target, piece curr_piece, 
-    piece promoted, flag capture, flag doublepush, flag enpassant, flag castling) {
+__always_inline Type::move encode_move (Type::square source, Type::square target, Type::piece curr_piece, 
+    Type::piece promoted, bool capture, bool doublepush, bool enpassant, bool castling) {
     return (source         | 
         (target << 6)      |
         (curr_piece << 12) |
@@ -229,11 +229,11 @@ __always_inline move encode_move (square source, square target, piece curr_piece
 }
 
 __always_inline void generate_moves_white_pawn(Moves &move_list) {
-    piece curr_piece = P;
-    square source_square;
-    square target_square;
-    bboard bitboard = pos.bitboards[curr_piece];
-    bboard attacks;
+    Type::piece curr_piece = P;
+    Type::square source_square;
+    Type::square target_square;
+    Type::bboard bitboard = pos.bitboards[curr_piece];
+    Type::bboard attacks;
 
     while (bitboard) {
         // Init source square
@@ -297,7 +297,7 @@ __always_inline void generate_moves_white_pawn(Moves &move_list) {
         // Generate en passant capture
         if (pos.enpassant != no_sq && getbit(pawn_mv_mask, pos.enpassant) && (!pinned || getbit(pin_mask[source_square], pos.enpassant))) {
             // Create en passant attack bitboard
-            bboard en_passant_attacks = Attacks::pawn(source_square, white) & (1ULL << pos.enpassant);
+            Type::bboard en_passant_attacks = Attacks::pawn(source_square, white) & (1ULL << pos.enpassant);
 
             // En passant capture available for this pawn
             if (en_passant_attacks) {
@@ -314,11 +314,11 @@ __always_inline void generate_moves_white_pawn(Moves &move_list) {
 }
 
 __always_inline void generate_moves_black_pawn(Moves &move_list) {
-    piece curr_piece = p;
-    square source_square;
-    square target_square;
-    bboard bitboard = pos.bitboards[curr_piece];
-    bboard attacks;
+    Type::piece curr_piece = p;
+    Type::square source_square;
+    Type::square target_square;
+    Type::bboard bitboard = pos.bitboards[curr_piece];
+    Type::bboard attacks;
 
     while (bitboard) {
         // Init source square
@@ -381,7 +381,7 @@ __always_inline void generate_moves_black_pawn(Moves &move_list) {
         // Generate en passant capture
         if (pos.enpassant != no_sq && getbit(pawn_mv_mask, pos.enpassant) && (!pinned || getbit(pin_mask[source_square], pos.enpassant))) {
             // Create en passant attack bitboard
-            bboard en_passant_attacks = Attacks::pawn(source_square, black) & (1ULL << pos.enpassant);
+            Type::bboard en_passant_attacks = Attacks::pawn(source_square, black) & (1ULL << pos.enpassant);
 
             // En passant capture available for this pawn
             if (en_passant_attacks) {
@@ -397,12 +397,12 @@ __always_inline void generate_moves_black_pawn(Moves &move_list) {
     }
 }
 
-__always_inline void generate_moves_rook (Moves &move_list, state side) {
-    square source_sq;
-    square target_sq;
-    piece curr_piece = (side == white) ? R : r;
-    bboard bitboard = pos.bitboards[curr_piece];
-    bboard attacks;
+__always_inline void generate_moves_rook (Moves &move_list, Type::side side) {
+    Type::square source_sq;
+    Type::square target_sq;
+    Type::piece curr_piece = (side == white) ? R : r;
+    Type::bboard bitboard = pos.bitboards[curr_piece];
+    Type::bboard attacks;
 
     while (bitboard) {
         // Init source square
@@ -435,12 +435,12 @@ __always_inline void generate_moves_rook (Moves &move_list, state side) {
     }
 }
 
-__always_inline void generate_moves_knight (Moves &move_list, state side) {
-    square source_sq;
-    square target_sq;
-    piece curr_piece = (side == white) ? N : n;
-    bboard bitboard = pos.bitboards[curr_piece];
-    bboard attacks;
+__always_inline void generate_moves_knight (Moves &move_list, Type::side side) {
+    Type::square source_sq;
+    Type::square target_sq;
+    Type::piece curr_piece = (side == white) ? N : n;
+    Type::bboard bitboard = pos.bitboards[curr_piece];
+    Type::bboard attacks;
 
     while (bitboard) {
         source_sq = getls1b(bitboard);
@@ -465,12 +465,12 @@ __always_inline void generate_moves_knight (Moves &move_list, state side) {
     }
 }
 
-__always_inline void generate_moves_bishop (Moves &move_list, state side) {
-    square source_sq;
-    square target_sq;
-    piece curr_piece = (side == white) ? B : b;
-    bboard bitboard = pos.bitboards[curr_piece];
-    bboard attacks;
+__always_inline void generate_moves_bishop (Moves &move_list, Type::side side) {
+    Type::square source_sq;
+    Type::square target_sq;
+    Type::piece curr_piece = (side == white) ? B : b;
+    Type::bboard bitboard = pos.bitboards[curr_piece];
+    Type::bboard attacks;
 
     while (bitboard) {
         source_sq = getls1b(bitboard);
@@ -543,12 +543,12 @@ __always_inline void generate_black_castling (Moves &move_list) {
     }
 }
 
-__always_inline void generate_moves_king (Moves &move_list, state side) {
-    square source_sq;
-    square target_sq;
-    piece curr_piece = (side == white) ? K : k;
-    bboard bitboard = pos.bitboards[curr_piece];
-    bboard attacks;
+__always_inline void generate_moves_king (Moves &move_list, Type::side side) {
+    Type::square source_sq;
+    Type::square target_sq;
+    Type::piece curr_piece = (side == white) ? K : k;
+    Type::bboard bitboard = pos.bitboards[curr_piece];
+    Type::bboard attacks;
 
     if (side == white) {
         generate_white_castling(move_list);
@@ -600,12 +600,12 @@ __always_inline void generate_moves_king (Moves &move_list, state side) {
     }
 }
 
-__always_inline void generate_moves_queen (Moves &move_list, state side) {
-    square source_sq;
-    square target_sq;
-    piece curr_piece = (side == white) ? Q : q;
-    bboard bitboard = pos.bitboards[curr_piece];
-    bboard attacks;
+__always_inline void generate_moves_queen (Moves &move_list, Type::side side) {
+    Type::square source_sq;
+    Type::square target_sq;
+    Type::piece curr_piece = (side == white) ? Q : q;
+    Type::bboard bitboard = pos.bitboards[curr_piece];
+    Type::bboard attacks;
 
     while (bitboard) {
         // Init source square

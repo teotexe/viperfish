@@ -7,5 +7,5 @@
 
 typedef struct {
     std::string fen;
-    std::vector<move> moves;
+    std::vector<Type::move> moves;
 } MoveTestCase;

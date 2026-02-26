@@ -28,7 +28,7 @@ private:
         12, 11, 11, 11, 11, 11, 11, 12,
     };
 
-    alignas(64) static constexpr bboard rook_magic_nums[64] = {
+    alignas(64) static constexpr Type::bboard rook_magic_nums[64] = {
         0x8a80104000800020ULL,
         0x140002000100040ULL,
         0x2801880a0017001ULL,
@@ -94,7 +94,7 @@ private:
         0x2006104900a0804ULL,
         0x1004081002402ULL,
     };
-    alignas(64) static constexpr bboard bishop_magic_nums[64] = {
+    alignas(64) static constexpr Type::bboard bishop_magic_nums[64] = {
         0x40040844404084ULL,
         0x2004208a004208ULL,
         0x10190041080202ULL,
@@ -161,15 +161,15 @@ private:
         0x4010011029020020ULL,
     };
 
-    alignas(64) static bboard pawn_att[2][64];
-    alignas(64) static bboard knight_att[64];
-    alignas(64) static bboard king_att[64];
+    alignas(64) static Type::bboard pawn_att[2][64];
+    alignas(64) static Type::bboard knight_att[64];
+    alignas(64) static Type::bboard king_att[64];
 
-    alignas(64) static bboard bishop_masks[64];
-    alignas(64) static bboard rook_masks[64];
+    alignas(64) static Type::bboard bishop_masks[64];
+    alignas(64) static Type::bboard rook_masks[64];
 
-    alignas(64) static bboard bishop_att[64][512];
-    alignas(64) static bboard rook_att[64][4096];
+    alignas(64) static Type::bboard bishop_att[64][512];
+    alignas(64) static Type::bboard rook_att[64][4096];
 
     static void init_pawn_attacks ();
     static void init_knight_attacks ();
@@ -183,31 +183,31 @@ private:
 public:
     static void init ();
 
-    static __always_inline bboard pawn (square sq, state side) {
+    static __always_inline Type::bboard pawn (Type::square sq, Type::side side) {
         return pawn_att[side][sq];
     }
 
-    static __always_inline bboard knight (square sq) {
+    static __always_inline Type::bboard knight (Type::square sq) {
         return knight_att[sq];
     }
 
-    static __always_inline bboard king (square sq) {
+    static __always_inline Type::bboard king (Type::square sq) {
         return king_att[sq];
     }
 
-    static __always_inline bboard bishop (square sq, bboard occ) {
+    static __always_inline Type::bboard bishop (Type::square sq, Type::bboard occ) {
         occ &= bishop_masks[sq];
         occ *= bishop_magic_nums[sq];
         return bishop_att[sq][occ >> (64 - bishop_relevant_bits[sq])];   
     }
 
-    static __always_inline bboard rook (square sq, bboard occ) {
+    static __always_inline Type::bboard rook (Type::square sq, Type::bboard occ) {
         occ &= rook_masks[sq];
         occ *= rook_magic_nums[sq];
         return rook_att[sq][occ >> (64 - rook_relevant_bits[sq])];
     }
 
-    static __always_inline bboard queen (square sq, bboard occ) {
+    static __always_inline Type::bboard queen (Type::square sq, Type::bboard occ) {
         return bishop(sq, occ) | rook(sq, occ);
     }
 };

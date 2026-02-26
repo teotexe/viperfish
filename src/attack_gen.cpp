@@ -1,17 +1,17 @@
 #include "attack_gen.hpp"
 
-bboard Attacks::pawn_att[2][64];
-bboard Attacks::knight_att[64];
-bboard Attacks::king_att[64];
+Type::bboard Attacks::pawn_att[2][64];
+Type::bboard Attacks::knight_att[64];
+Type::bboard Attacks::king_att[64];
 
-bboard Attacks::bishop_masks[64];
-bboard Attacks::rook_masks[64];
+Type::bboard Attacks::bishop_masks[64];
+Type::bboard Attacks::rook_masks[64];
 
-bboard Attacks::bishop_att[64][512];
-bboard Attacks::rook_att[64][4096];
+Type::bboard Attacks::bishop_att[64][512];
+Type::bboard Attacks::rook_att[64][4096];
 
-bboard create_bishop_table (square sq, bboard block) {
-    bboard att = 0ULL;
+Type::bboard create_bishop_table (Type::square sq, Type::bboard block) {
+    Type::bboard att = 0ULL;
 
     int8_t rank = getrank(sq);
     int8_t file = getfile(sq);
@@ -36,8 +36,8 @@ bboard create_bishop_table (square sq, bboard block) {
     return att;
 }
 
-bboard create_rook_table (square sq, bboard block) {
-    bboard att = 0ULL;
+Type::bboard create_rook_table (Type::square sq, Type::bboard block) {
+    Type::bboard att = 0ULL;
 
     int8_t rank = getrank(sq);
     int8_t file = getfile(sq);
@@ -62,13 +62,13 @@ bboard create_rook_table (square sq, bboard block) {
     return att;
 }
 
-bboard set_occupancy (uint16_t index, bboard mask) {
-    bboard occupancy = 0ULL;
+Type::bboard set_occupancy (uint16_t index, Type::bboard mask) {
+    Type::bboard occupancy = 0ULL;
     uint8_t bits = countbits(mask);
 
     // Project the binary representation of index onto the occupancy bitboard
     for (uint16_t i = 0; i < bits; i++) {
-        square sq = getls1b(mask);
+        Type::square sq = getls1b(mask);
         popbit(mask, sq);
 
         if (index & (1 << i)) {
@@ -81,20 +81,20 @@ bboard set_occupancy (uint16_t index, bboard mask) {
 
 void Attacks::init_pawn_attacks () {
     // White pawn attacks
-    for (square sq = a1; sq <= h8; sq++) {
+    for (Type::square sq = a1; sq <= h8; sq++) {
         pawn_att[white][sq] |= ((1ULL << sq << 7) & not_h_file);
         pawn_att[white][sq] |= ((1ULL << sq << 9) & not_a_file);
     }
 
     // Black pawn attacks
-    for (square sq = a1; sq <= h8; sq++) {
+    for (Type::square sq = a1; sq <= h8; sq++) {
         pawn_att[black][sq] |= ((1ULL << sq >> 7) & not_a_file);
         pawn_att[black][sq] |= ((1ULL << sq >> 9) & not_h_file);
     }
 }
 
 void Attacks::init_knight_attacks () {
-    for (square sq = a1; sq <= h8; sq++) {
+    for (Type::square sq = a1; sq <= h8; sq++) {
         knight_att[sq] |= ((1ULL << sq >> 17) & not_h_file);
         knight_att[sq] |= ((1ULL << sq >> 15) & not_a_file);
         knight_att[sq] |= ((1ULL << sq >> 10) & not_gh_files);
@@ -108,7 +108,7 @@ void Attacks::init_knight_attacks () {
 }
 
 void Attacks::init_king_attacks () {
-    for (square sq = a1; sq <= h8; sq++) {
+    for (Type::square sq = a1; sq <= h8; sq++) {
         king_att[sq] |= ((1ULL << sq >> 9) & not_h_file);
         king_att[sq] |= ((1ULL << sq >> 8));
         king_att[sq] |= ((1ULL << sq >> 7) & not_a_file);
@@ -123,7 +123,7 @@ void Attacks::init_king_attacks () {
 }
 
 void Attacks::init_bishop_masks () {
-    for (square sq = a1; sq <= h8; sq++) {
+    for (Type::square sq = a1; sq <= h8; sq++) {
         int8_t rank = getrank(sq);
         int8_t file = getfile(sq);
 
@@ -144,7 +144,7 @@ void Attacks::init_bishop_masks () {
 }
 
 void Attacks::init_rook_masks () {
-    for (square sq = a1; sq <= h8; sq++) {
+    for (Type::square sq = a1; sq <= h8; sq++) {
         int8_t rank = getrank(sq);
         int8_t file = getfile(sq);
 
@@ -166,9 +166,9 @@ void Attacks::init_rook_masks () {
 
 void Attacks::init_bishop_attacks () {
     // Occupancy
-    bboard occ;
+    Type::bboard occ;
 
-    for (square sq = a1; sq <= h8; sq++) {
+    for (Type::square sq = a1; sq <= h8; sq++) {
         // Number of different positions the blockers can be in
         uint16_t possibilities = (1 << countbits(bishop_masks[sq]));
 
@@ -186,9 +186,9 @@ void Attacks::init_bishop_attacks () {
 
 void Attacks::init_rook_attacks () {
     // Occupancy
-    bboard occ;
+    Type::bboard occ;
 
-    for (square sq = a1; sq <= h8; sq++) {
+    for (Type::square sq = a1; sq <= h8; sq++) {
         // Number of different positions the blockers can be in
         uint16_t possibilities = (1 << countbits(rook_masks[sq]));
 

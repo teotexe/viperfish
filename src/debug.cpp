@@ -1,6 +1,6 @@
 #include "debug.hpp"
 
-void print_bboard (bboard bb) {
+void print_bboard (Type::bboard bb) {
     for (int8_t rank = 7; rank >= 0; rank--) {
         for (int8_t file = 0; file < 8; file++) {
             std::cout << getbit(bb, rank * 8 + file);
@@ -14,14 +14,14 @@ void print_bboard (bboard bb) {
 void print_board () {
     for (int8_t rank = 7; rank >= 0; rank--) {
         for (int8_t file = 0; file <= 7; file++) {
-            square sq = rank * 8 + file;
+            Type::square sq = rank * 8 + file;
             if (!getbit(pos.occupancies[both], sq)) {
                 std::cout << ".";
                 continue;
             }
 
-            piece pc;
-            for (piece candidate = P; candidate <= q; candidate++) {
+            Type::piece pc;
+            for (Type::piece candidate = P; candidate <= q; candidate++) {
                 if (getbit(pos.bitboards[candidate], sq)) {
                     pc = candidate;
                     break;

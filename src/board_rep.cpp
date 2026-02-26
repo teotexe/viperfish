@@ -5,8 +5,8 @@
 
 BoardState pos;
 
-bboard checkers;
-bboard pins;
+Type::bboard checkers;
+Type::bboard pins;
 
 // flag castling;
 
